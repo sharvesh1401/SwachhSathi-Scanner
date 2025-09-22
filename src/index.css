@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SwachhSathi Design System - Eco-friendly waste management colors
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 120 20% 98%;
+    --foreground: 140 10% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 140 10% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 140 10% 15%;
+
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 76% 32%;
+
+    --secondary: 200 18% 46%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 200 18% 42%;
+
+    --muted: 120 20% 95%;
+    --muted-foreground: 140 8% 40%;
+
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 38 92% 45%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 120 13% 85%;
+    --input: 120 13% 90%;
+    --ring: 142 76% 36%;
+
+    --scanner-bg: 140 10% 10%;
+    --scanner-overlay: 0 0% 0% / 0.6;
+    --scanner-frame: 142 76% 50%;
+
+    --waste-dry: 38 92% 50%;
+    --waste-wet: 142 76% 36%;
+    --waste-recyclable: 200 98% 48%;
+    --waste-other: 280 65% 55%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 45%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(158 64% 52%));
+    --gradient-eco: linear-gradient(180deg, hsl(120 20% 98%), hsl(120 20% 95%));
+    
+    --shadow-card: 0 4px 6px -1px hsl(140 10% 15% / 0.1), 0 2px 4px -1px hsl(140 10% 15% / 0.06);
+    --shadow-scanner: 0 0 0 3px hsl(142 76% 50% / 0.3);
+    --shadow-floating: 0 10px 25px -5px hsl(140 10% 15% / 0.1), 0 10px 10px -5px hsl(140 10% 15% / 0.04);
+
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 140 20% 8%;
+    --foreground: 120 20% 95%;
+
+    --card: 140 15% 12%;
+    --card-foreground: 120 20% 95%;
+
+    --popover: 140 15% 12%;
+    --popover-foreground: 120 20% 95%;
+
+    --primary: 142 76% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 76% 50%;
+
+    --secondary: 200 18% 25%;
+    --secondary-foreground: 120 20% 95%;
+    --secondary-hover: 200 18% 30%;
+
+    --muted: 140 15% 15%;
+    --muted-foreground: 120 10% 60%;
+
+    --accent: 38 92% 55%;
+    --accent-foreground: 140 20% 8%;
+    --accent-hover: 38 92% 60%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 140 20% 8%;
+
+    --border: 140 15% 18%;
+    --input: 140 15% 15%;
+    --ring: 142 76% 45%;
+
+    --scanner-bg: 140 20% 5%;
+    --scanner-overlay: 0 0% 0% / 0.8;
+    --scanner-frame: 142 76% 55%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(142 76% 45%), hsl(142 76% 55%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 45%), hsl(158 64% 55%));
+    --gradient-eco: linear-gradient(180deg, hsl(140 20% 8%), hsl(140 15% 12%));
+    
+    --shadow-card: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -1px hsl(0 0% 0% / 0.2);
+    --shadow-scanner: 0 0 0 3px hsl(142 76% 55% / 0.4);
+    --shadow-floating: 0 10px 25px -5px hsl(0 0% 0% / 0.3), 0 10px 10px -5px hsl(0 0% 0% / 0.2);
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* QR Scanner specific styles */
+  .qr-scanner-container {
+    @apply relative overflow-hidden rounded-xl;
+    background: hsl(var(--scanner-bg));
+  }
+
+  .qr-scanner-overlay {
+    background: hsl(var(--scanner-overlay));
+  }
+
+  .qr-scanner-frame {
+    border: 3px solid hsl(var(--scanner-frame));
+    box-shadow: var(--shadow-scanner);
+  }
+
+  /* Waste type colors */
+  .waste-dry { 
+    background: linear-gradient(135deg, hsl(var(--waste-dry)), hsl(var(--waste-dry) / 0.8)); 
+  }
+  .waste-wet { 
+    background: linear-gradient(135deg, hsl(var(--waste-wet)), hsl(var(--waste-wet) / 0.8)); 
+  }
+  .waste-recyclable { 
+    background: linear-gradient(135deg, hsl(var(--waste-recyclable)), hsl(var(--waste-recyclable) / 0.8)); 
+  }
+  .waste-other { 
+    background: linear-gradient(135deg, hsl(var(--waste-other)), hsl(var(--waste-other) / 0.8)); 
+  }
+}
