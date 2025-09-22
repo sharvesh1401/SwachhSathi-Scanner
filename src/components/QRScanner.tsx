@@ -2,11 +2,10 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { QrReader } from '@cmdnio/react-qr-reader';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { parseQRCode, getScannerErrorMessage, DEFAULT_SCANNER_SETTINGS } from '@/utils/scanner';
+import { parseQRCode, getScannerErrorMessage } from '@/utils/scanner';
 import { getCurrentLocation } from '@/utils/location';
-import { Camera, ScanLine, X, Flashlight, RotateCw } from 'lucide-react';
+import { Camera, ScanLine, X, RotateCw } from 'lucide-react';
 
 interface QRScannerProps {
   onScanSuccess: (userId: string, location?: { lat: number; lng: number }) => void;
@@ -18,8 +17,33 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
   const [error, setError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const { toast } = useToast();
-  const scannerRef = useRef<any>(null);
+
+  // Check camera permissions on mount
+  useEffect(() => {
+    const checkCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            facingMode: 'environment',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          } 
+        });
+        // Stop all tracks to release the camera
+        stream.getTracks().forEach(track => track.stop());
+        setHasCameraPermission(true);
+        setError(null);
+      } catch (err) {
+        console.error('Camera permission denied:', err);
+        setHasCameraPermission(false);
+        setError(getScannerErrorMessage(err));
+      }
+    };
+
+    checkCameraPermission();
+  }, []);
 
   const handleScan = useCallback(async (result: any) => {
     if (result && !isProcessing) {
@@ -71,14 +95,17 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
 
   const handleError = useCallback((error: any) => {
     console.error('QR Scanner Error:', error);
-    const errorMessage = getScannerErrorMessage(error);
-    setError(errorMessage);
-    toast({
-      title: 'Scanner Error',
-      description: errorMessage,
-      variant: 'destructive'
-    });
-  }, [toast]);
+    // Only show error if we don't already have camera permission
+    if (!hasCameraPermission) {
+      const errorMessage = getScannerErrorMessage(error);
+      setError(errorMessage);
+      toast({
+        title: 'Scanner Error',
+        description: errorMessage,
+        variant: 'destructive'
+      });
+    }
+  }, [toast, hasCameraPermission]);
 
   const toggleCamera = () => {
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
@@ -90,7 +117,8 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
     setTimeout(() => setIsScanning(true), 500);
   };
 
-  if (error) {
+  // Show error screen if camera permission is denied
+  if (hasCameraPermission === false || error) {
     return (
       <div className="fixed inset-0 bg-scanner-bg z-50 flex items-center justify-center p-4">
         <motion.div
@@ -104,7 +132,9 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
           
           <div>
             <h3 className="text-lg font-semibold mb-2">Camera Access Required</h3>
-            <p className="text-sm text-muted-foreground">{error}</p>
+            <p className="text-sm text-muted-foreground">
+              {error || 'Please allow camera access to scan QR codes'}
+            </p>
           </div>
 
           <div className="flex gap-2">
@@ -117,6 +147,15 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
             </Button>
           </div>
         </motion.div>
+      </div>
+    );
+  }
+
+  // Show loading state while checking permissions
+  if (hasCameraPermission === null) {
+    return (
+      <div className="fixed inset-0 bg-scanner-bg z-50 flex items-center justify-center">
+        <div className="text-white">Checking camera permissions...</div>
       </div>
     );
   }
@@ -160,9 +199,12 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
       <div className="relative w-full h-full">
         {isScanning && (
           <QrReader
-            key={facingMode} // Force re-render when camera changes
+            key={facingMode}
             constraints={{
-              facingMode
+              facingMode,
+              // Remove aspectRatio constraint to prevent zooming
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
             }}
             onResult={(result, error) => {
               if (result) handleScan(result);
@@ -170,12 +212,18 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
             }}
             containerStyle={{
               width: '100%',
-              height: '100%'
+              height: '100%',
+              position: 'relative'
             }}
             videoStyle={{
               width: '100%',
               height: '100%',
               objectFit: 'cover'
+            }}
+            videoContainerStyle={{
+              width: '100%',
+              height: '100%',
+              position: 'relative'
             }}
           />
         )}
