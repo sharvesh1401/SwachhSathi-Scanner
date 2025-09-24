@@ -27,8 +27,9 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { 
             facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+            width: { ideal: 1920 }, // Increased for better quality
+            height: { ideal: 1080 },
+            zoom: { ideal: 0.5 } // Zoomed out view
           } 
         });
         // Stop all tracks to release the camera
@@ -45,12 +46,12 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
     checkCameraPermission();
   }, []);
 
-  const handleScan = useCallback(async (result: any) => {
+  const handleScan = useCallback(async (result: string | null) => {
     if (result && !isProcessing) {
       setIsProcessing(true);
       
       try {
-        const scanResult = parseQRCode(result.text);
+        const scanResult = parseQRCode(result);
         
         if (scanResult.isValid && scanResult.userId) {
           // Get location
@@ -120,7 +121,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
   // Show error screen if camera permission is denied
   if (hasCameraPermission === false || error) {
     return (
-      <div className="fixed inset-0 bg-scanner-bg z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -154,21 +155,21 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
   // Show loading state while checking permissions
   if (hasCameraPermission === null) {
     return (
-      <div className="fixed inset-0 bg-scanner-bg z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
         <div className="text-white">Checking camera permissions...</div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-scanner-bg z-50">
+    <div className="fixed inset-0 bg-black z-50">
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-10 p-4">
         <div className="flex items-center justify-between">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-card/20 backdrop-blur-md rounded-full px-4 py-2"
+            className="bg-black/50 backdrop-blur-md rounded-full px-4 py-2"
           >
             <span className="text-white text-sm font-medium">Scan QR Code</span>
           </motion.div>
@@ -177,7 +178,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
             <Button
               size="icon"
               variant="secondary"
-              className="bg-card/20 backdrop-blur-md border-0 text-white hover:bg-card/30"
+              className="bg-black/50 backdrop-blur-md border-0 text-white hover:bg-black/70"
               onClick={toggleCamera}
             >
               <RotateCw className="h-5 w-5" />
@@ -186,7 +187,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
             <Button
               size="icon"
               variant="secondary"
-              className="bg-card/20 backdrop-blur-md border-0 text-white hover:bg-card/30"
+              className="bg-black/50 backdrop-blur-md border-0 text-white hover:bg-black/70"
               onClick={onClose}
             >
               <X className="h-5 w-5" />
@@ -195,20 +196,24 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
         </div>
       </div>
 
-      {/* Scanner */}
+      {/* Scanner - Full screen without overlay */}
       <div className="relative w-full h-full">
         {isScanning && (
           <QrReader
             key={facingMode}
             constraints={{
               facingMode,
-              // Remove aspectRatio constraint to prevent zooming
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
+              width: { ideal: 1920 }, // Higher resolution for zoomed out view
+              height: { ideal: 1080 },
+              zoom: { ideal: 0.5 } // Zoom out to show more area
             }}
             onResult={(result, error) => {
-              if (result) handleScan(result);
-              if (error) handleError(error);
+              if (result) {
+                handleScan(result?.text || null);
+              }
+              if (error) {
+                handleError(error);
+              }
             }}
             containerStyle={{
               width: '100%',
@@ -228,8 +233,8 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
           />
         )}
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-scanner-overlay">
+        {/* Transparent overlay with only the scan frame */}
+        <div className="absolute inset-0 pointer-events-none">
           {/* Scan Area */}
           <div className="absolute inset-0 flex items-center justify-center">
             <motion.div
@@ -239,22 +244,22 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
               className="relative"
             >
               {/* Scan Frame */}
-              <div className="w-64 h-64 qr-scanner-frame rounded-2xl relative">
+              <div className="w-80 h-80 border-2 border-white/30 rounded-2xl relative bg-transparent">
                 {/* Corner indicators */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-l-4 border-t-4 border-scanner-frame rounded-tl-lg" />
-                <div className="absolute top-0 right-0 w-8 h-8 border-r-4 border-t-4 border-scanner-frame rounded-tr-lg" />
-                <div className="absolute bottom-0 left-0 w-8 h-8 border-l-4 border-b-4 border-scanner-frame rounded-bl-lg" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-r-4 border-b-4 border-scanner-frame rounded-br-lg" />
+                <div className="absolute top-0 left-0 w-8 h-8 border-l-4 border-t-4 border-white rounded-tl-lg" />
+                <div className="absolute top-0 right-0 w-8 h-8 border-r-4 border-t-4 border-white rounded-tr-lg" />
+                <div className="absolute bottom-0 left-0 w-8 h-8 border-l-4 border-b-4 border-white rounded-bl-lg" />
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-r-4 border-b-4 border-white rounded-br-lg" />
 
                 {/* Scanning line animation */}
                 <motion.div
-                  animate={{ y: [0, 240, 0] }}
+                  animate={{ y: [0, 304, 0] }}
                   transition={{
                     duration: 2,
                     repeat: Infinity,
                     ease: "linear"
                   }}
-                  className="absolute left-0 right-0 h-1 bg-scanner-frame rounded-full shadow-lg"
+                  className="absolute left-0 right-0 h-1 bg-white rounded-full shadow-lg"
                   style={{ top: '12px' }}
                 />
               </div>
@@ -266,9 +271,9 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
                 transition={{ delay: 0.5 }}
                 className="mt-8 text-center"
               >
-                <div className="bg-card/20 backdrop-blur-md rounded-2xl px-6 py-4 mx-4">
+                <div className="bg-black/50 backdrop-blur-md rounded-2xl px-6 py-4 mx-4">
                   <div className="flex items-center justify-center mb-2">
-                    <ScanLine className="h-6 w-6 text-scanner-frame animate-scan-pulse mr-2" />
+                    <ScanLine className="h-6 w-6 text-white animate-pulse mr-2" />
                     <span className="text-white font-medium">
                       {isProcessing ? 'Processing...' : 'Position QR code within the frame'}
                     </span>
@@ -294,7 +299,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onClose }) => {
           <Button
             size="lg"
             variant="secondary"
-            className="bg-card/20 backdrop-blur-md border-0 text-white hover:bg-card/30"
+            className="bg-black/50 backdrop-blur-md border-0 text-white hover:bg-black/70"
             onClick={onClose}
           >
             Cancel Scan
